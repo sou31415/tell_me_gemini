@@ -1,6 +1,7 @@
 pub mod model;
 pub mod secret;
-use crate::model::{Args, Content, Part, ResponseModel, StdPostModel};
+use crate::model::{Args, ResponseModel, StdPostModel};
+use clap::Parser;
 use reqwest::Client;
 use secret::TOKEN;
 
@@ -12,14 +13,7 @@ async fn main() -> reqwest::Result<()> {
             .to_string()
             + TOKEN;
     let client = Client::new();
-    let data = StdPostModel {
-        contents: vec![Content {
-            parts: vec![Part {
-                text: "hello.".to_string(),
-            }],
-            role: "user".to_string(),
-        }],
-    };
+    let data = StdPostModel::new(arg.prompt.clone());
     let res = client
         .post(url)
         .json(&data)
@@ -27,6 +21,6 @@ async fn main() -> reqwest::Result<()> {
         .await?
         .json::<ResponseModel>()
         .await?;
-    println!("{:?}", res.candidates);
+    println!("{}", res.candidates[0].content.parts[0].text);
     Ok(())
 }

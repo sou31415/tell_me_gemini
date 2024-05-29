@@ -1,13 +1,18 @@
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 
+#[allow(legacy_derive_helpers)]
+#[command(
+    author = "RuSwiftive",
+    version = "0.1.0",
+    about = "Hear what you want to hear with Gemini 1.0 Pro."
+)]
+#[allow(legacy_derive_helpers)]
 #[derive(Debug, Parser)]
-#[command(author,version,about,long_about = None)]
 pub struct Args {
+    /// Write what you wanna ask.
     #[arg(short, long)]
-    prompt: String,
-    #[arg(short,long,default_value=None)]
-    role: Option<String>,
+    pub prompt: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -22,17 +27,24 @@ pub struct Content {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(non_snake_case)]
 pub struct StdPostModel {
     pub contents: Vec<Content>,
+    pub systemInstruction: Option<Content>,
 }
+
 impl StdPostModel {
     pub fn new(value: String) -> Self {
-        Self {
-            contents: vec![Content {
-                parts: vec![Part { text: value }],
-                role: "user".to_string(),
-            }],
-        }
+        let response = {
+            Self {
+                contents: vec![Content {
+                    parts: vec![Part { text: value }],
+                    role: "user".to_string(),
+                }],
+                systemInstruction: None,
+            }
+        };
+        return response;
     }
 }
 
@@ -42,6 +54,7 @@ pub struct Candidate {
     pub content: Content,
     finishReason: String,
     index: usize,
+    #[allow(non_snake_case)]
     safetyRatings: Vec<SafetyRating>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -56,9 +69,8 @@ pub struct ResponseModel {
     pub candidates: Vec<Candidate>,
     pub usageMetadata: Metadata,
 }
-
-#[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
+#[allow(non_snake_case)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct citationSource {
     startIndex: usize,
@@ -68,7 +80,6 @@ pub struct citationSource {
 }
 
 #[allow(non_snake_case)]
-#[allow(non_camel_case_types)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Metadata {
     promptTokenCount: usize,
