@@ -1,18 +1,20 @@
 use clap::Parser;
+use std::fmt;
 use serde::{Deserialize, Serialize};
+use chrono::Local;
 
-#[allow(legacy_derive_helpers)]
+#[derive(Debug, Parser)]
 #[command(
     author = "RuSwiftive",
     version = "0.1.0",
     about = "Hear what you want to hear with Gemini 1.0 Pro."
 )]
-#[allow(legacy_derive_helpers)]
-#[derive(Debug, Parser)]
 pub struct Args {
     /// Write what you wanna ask.
     #[arg(short, long)]
-    pub prompt: String,
+    pub prompt: Option<String>,
+    #[arg(short,long)]
+    pub history:bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -20,6 +22,28 @@ pub struct Part {
     pub text: String,
 }
 
+#[derive(Clone,Serialize,Deserialize)]
+pub struct AppendToFile {
+    pub prompt:String,
+    pub answer:String,
+    pub time:String,
+}
+impl AppendToFile {
+    pub fn new(prompt:String,answer:String) -> Self {
+        let now = Local::now();
+        Self {
+            prompt,
+            answer,
+            time:format!("{:?}",now),
+        }
+    }
+}
+impl fmt::Display for AppendToFile {
+    fn fmt(&self,f: &mut fmt::Formatter<'_>) -> fmt::Result{
+        let s = format!("\nTime : {}\nQuestion : {}\nAnswer : {}\n",self.time,self.prompt,self.answer);
+        write!(f,"{}",s)
+    }
+}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Content {
     pub parts: Vec<Part>,
