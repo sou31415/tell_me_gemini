@@ -12,9 +12,11 @@ use chrono::Local;
 pub struct Args {
     /// Write what you wanna ask.
     #[arg(short, long)]
-    pub prompt: Option<String>,
+    pub custom: Option<String>,
     #[arg(short,long)]
     pub history:bool,
+    #[arg(short,long)]
+    pub translate:Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -24,15 +26,15 @@ pub struct Part {
 
 #[derive(Clone,Serialize,Deserialize)]
 pub struct AppendToFile {
-    pub prompt:String,
+    pub custom:String,
     pub answer:String,
     pub time:String,
 }
 impl AppendToFile {
-    pub fn new(prompt:String,answer:String) -> Self {
+    pub fn new(custom:String,answer:String) -> Self {
         let now = Local::now();
         Self {
-            prompt,
+            custom,
             answer,
             time:format!("{:?}",now),
         }
@@ -40,7 +42,7 @@ impl AppendToFile {
 }
 impl fmt::Display for AppendToFile {
     fn fmt(&self,f: &mut fmt::Formatter<'_>) -> fmt::Result{
-        let s = format!("\nTime : {}\nQuestion : {}\nAnswer : {}\n",self.time,self.prompt,self.answer);
+        let s = format!("\nTime : {}\nQuestion : {}\nAnswer : {}\n",self.time,self.custom,self.answer);
         write!(f,"{}",s)
     }
 }
@@ -106,7 +108,7 @@ pub struct citationSource {
 #[allow(non_snake_case)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Metadata {
-    promptTokenCount: usize,
+    customTokenCount: usize,
     candidatesTokenCount: usize,
     totalTokenCount: usize,
 }
