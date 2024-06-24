@@ -1,7 +1,7 @@
-use clap::Parser;
-use std::fmt;
-use serde::{Deserialize, Serialize};
 use chrono::Local;
+use clap::Parser;
+use serde::{Deserialize, Serialize};
+use std::fmt;
 
 #[derive(Debug, Parser)]
 #[command(
@@ -12,9 +12,18 @@ use chrono::Local;
 pub struct Args {
     /// Write what you wanna ask.
     #[arg(short, long)]
-    pub prompt: Option<String>,
-    #[arg(short,long)]
-    pub history:bool,
+    pub custom: Option<String>,
+    #[arg(long)]
+    pub history: bool,
+    #[arg(short, long)]
+    pub translate: Option<Language>,
+}
+
+#[derive(Debug, Clone, clap::ValueEnum)]
+pub enum Language {
+    En,
+    Jp,
+    Fr,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -22,26 +31,29 @@ pub struct Part {
     pub text: String,
 }
 
-#[derive(Clone,Serialize,Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct AppendToFile {
-    pub prompt:String,
-    pub answer:String,
-    pub time:String,
+    pub custom: String,
+    pub answer: String,
+    pub time: String,
 }
 impl AppendToFile {
-    pub fn new(prompt:String,answer:String) -> Self {
+    pub fn new(custom: String, answer: String) -> Self {
         let now = Local::now();
         Self {
-            prompt,
+            custom,
             answer,
-            time:format!("{:?}",now),
+            time: format!("{:?}", now),
         }
     }
 }
 impl fmt::Display for AppendToFile {
-    fn fmt(&self,f: &mut fmt::Formatter<'_>) -> fmt::Result{
-        let s = format!("\nTime : {}\nQuestion : {}\nAnswer : {}\n",self.time,self.prompt,self.answer);
-        write!(f,"{}",s)
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s = format!(
+            "\nTime : {}\nQuestion : {}\nAnswer : {}\n",
+            self.time, self.custom, self.answer
+        );
+        write!(f, "{}", s)
     }
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
