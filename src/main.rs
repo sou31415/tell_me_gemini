@@ -14,7 +14,7 @@ use secret::TOKEN;
 async fn main() -> reqwest::Result<()> {
     let arg = Args::parse();
     let url: String =
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key="
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key="
             .to_string()
             + TOKEN;
     if !arg.history.clone() {
